@@ -106,7 +106,7 @@ var Html5FieldGroupToggler = function() {
     };
 
     var queryGroupElements = function(groupName) {
-        return $('[data-field-group~="' + groupName + '"]');
+        return document.querySelectorAll('[data-field-group~="' + groupName + '"]');
     };
     var enableValidation = function() {
         Html5FieldValidationToggler.get(this).enableValidation();
@@ -124,22 +124,33 @@ var Html5FieldGroupToggler = function() {
         }
         var currentGroup = queryGroupElements(groupName);
         if (validate == undefined) {
-            var elementsWithoutValidation = currentGroup.filter('[' + noValidateDataAttr + ']');
-            currentGroup.filter(':not([' + noValidateDataAttr + '])')
-                .each(disableValidation);
-            elementsWithoutValidation.each(enableValidation);
-
+            for (var i=currentGroup.length, el; --i >=0;) {
+                el = currentGroup[i];
+                if (el.hasAttribute(noValidateDataAttr)) {
+                    enableValidation.call(el);
+                } else {
+                    disableValidation.call(el);
+                }
+            }
         } else if (validate) {
-            currentGroup.each(disableValidation);
+            for (var i=currentGroup.length, el; --i >=0;) {
+                el = currentGroup[i];
+                disableValidation.call(el);
+            }
         } else {
-            currentGroup.filter('[' + noValidateDataAttr + ']').each(enableValidation);
+            for (var i=currentGroup.length, el; --i >=0;) {
+                el = currentGroup[i];
+                if (el.hasAttribute(noValidateDataAttr)) {
+                    enableValidation.call(el);
+                }
+            }
         }
 
         return this;
     };
 
     this.addValidationGroup = function(groupName) {
-        fieldGroups[groupName] = {} 
+        fieldGroups[groupName] = {}
         return this;
     };
 
@@ -157,6 +168,7 @@ var Html5FieldGroupToggler = function() {
     return this;
 };
 
+window.Html5FieldValidationToggler = Html5FieldValidationToggler;
 window.Html5FieldGroupToggler = Html5FieldGroupToggler;
 
 })();
